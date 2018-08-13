@@ -1,32 +1,43 @@
 import pytest
 import rustcfg
 
-"""
-"cfg(ok)", "cfg( ok )".parse::<Target>().unwrap().to_string());
-"foo-bar-baz", "foo-bar-baz".parse::<Target>().unwrap().to_string());
-"foo-bar-baz-quz", " foo-bar-baz-quz ".parse::<Target>().unwrap().to_string());
-"cfg(foo)", &Cfg::Is("foo".to_string()).to_string());
-"cfg(not(foo))", &Cfg::Not(Box::new(Cfg::Is("foo".to_string()))).to_string());
-"cfg(not(any(foo, bar)))
-"""
-
 testdata = [
+    # None means expression is unparsable
     ('cfg(ok)', True),
+    ('cfg(not_ok)', False),
     ('cfg( ok )', True),
-    ('cfg(foo-bar-bar)', True),
+    ('cfg(foo-bar-bar)', None),
+    ('cfg(foo_bar_bar)', True),
     (' foo-bar-bar ', False),
-    (' cfg(not(foo))', True),
-    (' cfg(not(foo foo))', False),
+    (' cfg(not(foo))', False),
+    (' cfg(not(foo foo))', None),
     ('cfg(any(asdf, asdf))', True),
     ('cfg(all(asdf, asdf))', True),
-    ('cfg(any())', False),
-    ('cfg(all())', False),
-    ('cfg(all(not(asdf)))', True),
-    ('cfg(all(not(any(all(asdf)))))', True),
+    ('cfg(any())', None),
+    ('cfg(all())', None),
+    ('cfg(all(not(asdf)))', False),
+    ('cfg(all(not(any(all(asdf)))))', False),
+    ('cfg(foo="bar")', True),
+    ('cfg(foo = "bar")', True),
+    ('cfg(foo = " bar ")', True),
+    ('cfg(foo = "not bar")', False),
+    ('cfg(foo=bar)', None),
+    ('cfg(foo foo = = " bar ")', None),
+    ('cfg(foo = foo = " bar ")', None),
 ]
 
-@pytest.mark.parametrize("expression,ok", testdata)
-def test_parsing(expression, ok):
+@pytest.fixture
+def asdf_evaluator():
+    options = ('ok',
+               'foo_bar_bar',
+               'foo',
+               'asdf',
+               ('foo', 'bar'),
+               ('foo', ' bar '))
+    return rustcfg.Evaluator(options=options)
+
+@pytest.mark.parametrize("expression,result", testdata)
+def test_parsing(expression, result, asdf_evaluator):
     g = rustcfg.cfg_grammar()
     try:
         t = g.parseString(expression)
@@ -34,4 +45,8 @@ def test_parsing(expression, ok):
         good = False
     else:
         good = True
-    assert good == ok
+    assert good == (result is not None)
+
+    if result is not None:
+        res = asdf_evaluator.eval_tree(t)
+        assert res == result
