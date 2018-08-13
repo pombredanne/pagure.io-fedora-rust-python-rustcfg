@@ -4,6 +4,8 @@ import string
 import pyparsing as pp
 from functools import lru_cache
 
+__version__ = '0.0.0'
+
 def paren_exp(keyword, contents):
     return pp.Keyword(keyword)('op') + pp.Suppress('(') + contents + pp.Suppress(')')
 
