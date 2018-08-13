@@ -54,7 +54,6 @@ class Evaluator:
     """
     def __init__(self, options=()):
         self.options = options
-        self.tree = None
 
     def eval_tree(self, tree):
         kind = tree.getName()
@@ -84,9 +83,6 @@ class Evaluator:
         else:
             assert False, f'Unknown element {kind}'
 
-    def eval_parsed(self):
-        return self.eval_tree(self.tree)
-
     @classmethod
     def platform(cls):
         """An Evaluator populated with some platform options
@@ -98,6 +94,7 @@ class Evaluator:
         return cls(options=('unix',
                             ('target_os', 'linux')))
 
-    def parse(self, string):
+    def parse_and_eval(self, string):
         g = cfg_grammar()
-        self.tree = g.parseString(string)
+        t = g.parseString(string)
+        return self.eval_tree(t)

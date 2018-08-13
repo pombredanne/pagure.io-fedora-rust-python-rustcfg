@@ -70,6 +70,5 @@ def linux_evaluator():
 
 @pytest.mark.parametrize("expression,result", linux_data)
 def test_linux(expression, result, linux_evaluator):
-    linux_evaluator.parse(expression)
-    res = linux_evaluator.eval_parsed()
-    res == result
+    res = linux_evaluator.parse_and_eval(expression)
+    assert res == result
