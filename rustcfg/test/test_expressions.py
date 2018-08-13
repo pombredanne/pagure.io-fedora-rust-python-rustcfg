@@ -1,7 +1,7 @@
 import pytest
 import rustcfg
 
-testdata = [
+asdf_data = [
     # None means expression is unparsable
     ('cfg(ok)', True),
     ('cfg(not_ok)', False),
@@ -23,8 +23,7 @@ testdata = [
     ('cfg(foo = "not bar")', False),
     ('cfg(foo=bar)', None),
     ('cfg(foo foo = = " bar ")', None),
-    ('cfg(foo = foo = " bar ")', None),
-]
+    ('cfg(foo = foo = " bar ")', None)]
 
 @pytest.fixture
 def asdf_evaluator():
@@ -36,7 +35,7 @@ def asdf_evaluator():
                ('foo', ' bar '))
     return rustcfg.Evaluator(options=options)
 
-@pytest.mark.parametrize("expression,result", testdata)
+@pytest.mark.parametrize("expression,result", asdf_data)
 def test_parsing(expression, result, asdf_evaluator):
     g = rustcfg.cfg_grammar()
     try:
@@ -50,3 +49,27 @@ def test_parsing(expression, result, asdf_evaluator):
     if result is not None:
         res = asdf_evaluator.eval_tree(t)
         assert res == result
+
+linux_data = [
+    ('cfg(unix)', True),
+    ('cfg(windows)', False),
+
+    ('cfg(all(unix, not(target_os = "fuchsia"), not(target_os = "emscripten"), not(target_os = "macos"), not(target_os = "ios")))', True),
+    ("cfg(all(unix, not(target_os = \"fuchsia\"), not(target_os = \"emscripten\"), not(target_os = \"macos\"), not(target_os = \"ios\")))", True),
+
+    ("cfg(all(unix, not(target_os = \"macos\")))", True),
+    ('cfg(not(any(target_os = "windows", target_os = "macos")))', True),
+    ('cfg(not(target_os = "redox"))', True),
+    ('cfg(not(target_os = "windows"))', True),
+    ("cfg(not(target_os = \"windows\"))", True),
+    ('cfg(target_env = "msvc")', False)]
+
+@pytest.fixture
+def linux_evaluator():
+    return rustcfg.Evaluator.platform()
+
+@pytest.mark.parametrize("expression,result", linux_data)
+def test_linux(expression, result, linux_evaluator):
+    linux_evaluator.parse(expression)
+    res = linux_evaluator.eval_parsed()
+    res == result

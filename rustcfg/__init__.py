@@ -30,6 +30,17 @@ def cfg_grammar():
     grammar = (cfg_exp() | multiarch_tuple()) + pp.stringEnd()
     return grammar
 
+def dump_tree(t, level=0, evalf=None):
+    print('{}structure {}{}{}{}'.format('    '*level, t.getName(),
+                                        ' [' if evalf else '',
+                                        evalf(t) if evalf else '',
+                                        ']' if evalf else ''))
+    for item in t:
+        if isinstance(item, str):
+            print('{}{!r}'.format('    '*(level+1), item))
+        else:
+            dump_tree(item, level+1, evalf=evalf)
+
 class Evaluator:
     """Evalutate cfg expressions
 
@@ -43,6 +54,7 @@ class Evaluator:
     """
     def __init__(self, options=()):
         self.options = options
+        self.tree = None
 
     def eval_tree(self, tree):
         kind = tree.getName()
@@ -72,13 +84,20 @@ class Evaluator:
         else:
             assert False, f'Unknown element {kind}'
 
-def dump_tree(t, level=0, evalf=None):
-    print('{}structure {}{}{}{}'.format('    '*level, t.getName(),
-                                        ' [' if evalf else '',
-                                        evalf(t) if evalf else '',
-                                        ']' if evalf else ''))
-    for item in t:
-        if isinstance(item, str):
-            print('{}{!r}'.format('    '*(level+1), item))
-        else:
-            dump_tree(item, level+1, evalf=evalf)
+    def eval_parsed(self):
+        return self.eval_tree(self.tree)
+
+    @classmethod
+    def platform(cls):
+        """An Evaluator populated with some platform options
+
+        I don't see a list that'd specify what the allowed options
+        are, so this is culled from deps used in crates packaged in
+        Fedora 28.
+        """
+        return cls(options=('unix',
+                            ('target_os', 'linux')))
+
+    def parse(self, string):
+        g = cfg_grammar()
+        self.tree = g.parseString(string)
