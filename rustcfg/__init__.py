@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 import string
 import pyparsing as pp
 from functools import lru_cache
