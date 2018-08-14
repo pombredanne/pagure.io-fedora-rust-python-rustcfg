@@ -10,7 +10,7 @@ setup(
     author='Zbigniew Jędrzejewski-Szmek',
     author_email='zbyszek@in.waw.pl',
     license='LGPL-2.1+',
-    url='https://pagure.io/python-rustcfg',
+    url='https://pagure.io/fedora-rust/python-rustcfg',
     packages=find_packages(),
     tests_require=['pytest'],
     classifiers=[
