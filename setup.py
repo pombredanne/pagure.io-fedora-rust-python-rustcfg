@@ -5,6 +5,7 @@ setup(
     version='0.0.0',
     description='Rust cfg expression parser in python',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     author='Zbigniew Jędrzejewski-Szmek',
     author_email='zbyszek@in.waw.pl',
     license='MIT',
