@@ -12,6 +12,7 @@ setup(
     license='MIT',
     url='https://pagure.io/fedora-rust/python-rustcfg',
     packages=find_packages(),
+    install_requires=['pyparsing'],
     tests_require=['pytest'],
     classifiers=[
         'Development Status :: 3 - Alpha',
