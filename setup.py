@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
-import rustcfg
-
 setup(
     name='rustcfg',
-    version=rustcfg.__version__,
+    version='0.0.0',
     description='Rust cfg expression parser in python',
     long_description=open('README.md').read(),
     author='Zbigniew Jędrzejewski-Szmek',
