@@ -2,4 +2,6 @@
 *~
 *.py[co]
 /.tox/
+/build/
+/dist/
 /rustcfg.egg-info/
