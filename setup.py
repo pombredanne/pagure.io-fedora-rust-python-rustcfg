@@ -12,7 +12,9 @@ setup(
     url='https://pagure.io/fedora-rust/python-rustcfg',
     packages=find_packages(),
     install_requires=['pyparsing'],
-    tests_require=['pytest'],
+    extras_require={
+        'test': ['pytest'],
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
